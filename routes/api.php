@@ -883,3 +883,7 @@ Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey',
         Route::get('/', [FrontendOutletController::class, 'index']);
     });
 });
+
+// Open product import endpoints — no auth, no middleware
+Route::post('/product-import/preview', [ProductController::class, 'previewCustomImport']);
+Route::post('/product-import/import', [ProductController::class, 'importCustom']);

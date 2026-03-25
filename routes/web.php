@@ -40,4 +40,11 @@ Route::prefix('payment')->name('payment.')->middleware(['installed'])->group(fun
     Route::get('/successful/{order}', [PaymentController::class, 'successful'])->name('successful');
 });
 
+Route::get('/admin/import-products', function () {
+    return view('admin.product-custom-import', [
+        'apiKey' => env('VITE_API_KEY', ''),
+        'appUrl' => rtrim(env('APP_URL', ''), '/'),
+    ]);
+});
+
 Route::get('/{any}', [RootController::class, 'index'])->middleware(['installed'])->where(['any' => '.*']);

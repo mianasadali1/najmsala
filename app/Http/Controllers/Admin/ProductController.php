@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Exports\ProductExport;
 use App\Imports\ProductImport;
 use App\Services\ProductService;
+use App\Services\ProductCustomImportService;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\PaginateRequest;
@@ -217,6 +218,32 @@ class ProductController extends AdminController implements HasMiddleware
     {
         try {
             return new ProductAdminResource($this->productService->clearOffer($product));
+        } catch (Exception $exception) {
+            return response(['status' => false, 'message' => $exception->getMessage()], 422);
+        }
+    }
+
+    public function previewCustomImport(Request $request)
+    {
+        $request->validate(['file' => ['required', 'file', 'mimes:xls,xlsx', 'max:10240']]);
+        try {
+            $rows = (new ProductCustomImportService())->preview($request->file('file'));
+            return response()->json(['data' => $rows]);
+        } catch (Exception $exception) {
+            return response(['status' => false, 'message' => $exception->getMessage()], 422);
+        }
+    }
+
+    public function importCustom(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xls,xlsx', 'max:10240'],
+        ]);
+        try {
+            $rows     = (new ProductCustomImportService())->import($request->file('file'));
+            $imported = count(array_filter($rows, fn($r) => $r['status'] === 'imported'));
+            $skipped  = count(array_filter($rows, fn($r) => $r['status'] === 'error'));
+            return response()->json(['data' => $rows, 'imported' => $imported, 'skipped' => $skipped]);
         } catch (Exception $exception) {
             return response(['status' => false, 'message' => $exception->getMessage()], 422);
         }

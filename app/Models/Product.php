@@ -48,7 +48,9 @@ class Product extends Model implements HasMedia
         'shipping_type',
         'shipping_cost',
         'is_product_quantity_multiply',
-
+        'thumbnail_url',
+        'image1_url',
+        'image2_url',
     ];
     protected array $dates = ['deleted_at'];
     protected $casts = [
@@ -81,7 +83,9 @@ class Product extends Model implements HasMedia
         'shipping_type'                => 'integer',
         'shipping_cost'                => 'string',
         'is_product_quantity_multiply' => 'integer',
-
+        'thumbnail_url'                => 'string',
+        'image1_url'                   => 'string',
+        'image2_url'                   => 'string',
     ];
 
     public function scopeActive($query, $col = 'status')
@@ -99,61 +103,99 @@ class Product extends Model implements HasMedia
 
     public function getImageAttribute(): string
     {
+        // Prefer Spatie media URLs when available, but gracefully fall back to DB columns
+        // (thumbnail_url / image1_url / image2_url) when media/conversions are missing.
         if (!empty($this->getFirstMediaUrl('product'))) {
             return asset($this->getFirstMediaUrl('product'));
         }
-        return asset('images/default/product/thumb.png');
+
+        return $this->thumbnail_url ?? $this->image1_url ?? asset('images/default/product/thumb.png');
     }
 
     public function getImagesAttribute(): array
     {
-        $response = [];
-        if (!empty($this->getFirstMediaUrl('product'))) {
-            $images = $this->getMedia('product');
-            foreach ($images as $image) {
-                $response[] = $image['original_url'];
+        $media = $this->getMedia('product');
+        if ($media->isNotEmpty()) {
+            // Use original URLs only when they actually exist.
+            $urls = $media
+                ->map(fn($m) => $m->original_url)
+                ->filter(fn($u) => !empty($u))
+                ->values()
+                ->toArray();
+
+            if (!empty($urls)) {
+                return $urls;
             }
         }
-        return $response;
+
+        return array_values(array_filter([$this->thumbnail_url, $this->image1_url, $this->image2_url]));
     }
 
     public function getThumbAttribute(): string
     {
-        if (!empty($this->getFirstMediaUrl('product'))) {
-            $product = $this->getMedia('product')->first();
-            return $product->getUrl('thumb');
+        $media = $this->getMedia('product')->first();
+        if ($media) {
+            $thumbUrl = (method_exists($media, 'hasGeneratedConversion') && $media->hasGeneratedConversion('thumb'))
+                ? $media->getUrl('thumb')
+                : '';
+            if (!empty($thumbUrl)) {
+                return $thumbUrl;
+            }
         }
-        return asset('images/default/product/thumb.png');
+
+        return $this->thumbnail_url ?? $this->image1_url ?? asset('images/default/product/thumb.png');
     }
 
     public function getCoverAttribute(): string
     {
-        if (!empty($this->getFirstMediaUrl('product'))) {
-            $product = $this->getMedia('product')->first();
-            return $product->getUrl('cover');
+        $media = $this->getMedia('product')->first();
+        if ($media) {
+            $coverUrl = (method_exists($media, 'hasGeneratedConversion') && $media->hasGeneratedConversion('cover'))
+                ? $media->getUrl('cover')
+                : '';
+            if (!empty($coverUrl)) {
+                return $coverUrl;
+            }
         }
-        return asset('images/default/product/cover.png');
+
+        return $this->thumbnail_url ?? $this->image1_url ?? asset('images/default/product/cover.png');
     }
 
     public function getPreviewAttribute(): string
     {
-        if (!empty($this->getFirstMediaUrl('product'))) {
-            $product = $this->getMedia('product')->first();
-            return $product->getUrl('preview');
+        $media = $this->getMedia('product')->first();
+        if ($media) {
+            $previewUrl = (method_exists($media, 'hasGeneratedConversion') && $media->hasGeneratedConversion('preview'))
+                ? $media->getUrl('preview')
+                : '';
+            if (!empty($previewUrl)) {
+                return $previewUrl;
+            }
         }
-        return asset('images/default/product/preview.png');
+
+        return $this->thumbnail_url ?? $this->image1_url ?? asset('images/default/product/preview.png');
     }
 
     public function getPreviewsAttribute(): array
     {
-        $response = [];
-        if (!empty($this->getFirstMediaUrl('product'))) {
-            $images = $this->getMedia('product');
-            foreach ($images as $image) {
-                $response[] = $image->getUrl('preview');
+        $media = $this->getMedia('product');
+        if ($media->isNotEmpty()) {
+            $urls = $media
+                ->map(function ($m) {
+                    return (method_exists($m, 'hasGeneratedConversion') && $m->hasGeneratedConversion('preview'))
+                        ? $m->getUrl('preview')
+                        : null;
+                })
+                ->filter(fn($u) => !empty($u))
+                ->values()
+                ->toArray();
+
+            if (!empty($urls)) {
+                return $urls;
             }
         }
-        return $response;
+
+        return array_values(array_filter([$this->thumbnail_url, $this->image1_url, $this->image2_url]));
     }
 
     public function getBarcodeImageAttribute(): string
