@@ -1,1 +1,0 @@
-import{_ as s,c as n,o as a,a as e,t as l}from"./app-3N8FvZRn.js";const c={name:"SmIconDeleteComponent"},r={class:"db-table-action delete"},p={class:"db-tooltip"};function i(o,t,d,_,m,b){return a(),n("button",r,[t[0]||(t[0]=e("i",{class:"lab lab-line-trash"},null,-1)),e("span",p,l(o.$t("button.delete")),1)])}const f=s(c,[["render",i]]);export{f as S};

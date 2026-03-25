@@ -1,0 +1,1 @@
+import{_ as e,r as n,k as t,o as r}from"./app-BVYdGrzu.js";const s={name:"TaxComponent"};function a(c,p,_,m,f,i){const o=n("router-view");return r(),t(o)}const x=e(s,[["render",a]]);export{x as default};

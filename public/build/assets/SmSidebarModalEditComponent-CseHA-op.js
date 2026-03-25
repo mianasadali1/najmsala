@@ -1,1 +1,0 @@
-import{_ as n,c as a,o as s,a as o,t as i}from"./app-3N8FvZRn.js";const d={name:"SmSidebarModalEditComponent"},l={type:"button","data-modal":"#sidebar",class:"db-btn-outline info text-xs"};function r(e,t,p,c,b,m){return s(),a("button",l,[t[0]||(t[0]=o("i",{class:"lab lab-line-edit"},null,-1)),o("span",null,i(e.$t("button.edit")),1)])}const _=n(d,[["render",r]]);export{_ as S};
