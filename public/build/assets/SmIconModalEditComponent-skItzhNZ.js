@@ -1,0 +1,1 @@
+import{_ as s,c as e,o as a,a as o,t as c}from"./app-GJ1prmrk.js";const i={name:"SmIconModalEditComponent"},l={class:"db-table-action edit modal-btn"},d={class:"db-tooltip"};function r(n,t,p,m,_,b){return a(),e("button",l,[t[0]||(t[0]=o("i",{class:"lab lab-line-edit"},null,-1)),o("span",d,c(n.$t("button.edit")),1)])}const f=s(i,[["render",r]]);export{f as S};

@@ -1,0 +1,1 @@
+import{_ as o,r as n,k as t,o as r}from"./app-GJ1prmrk.js";const s={name:"BenefitComponent"};function c(a,p,_,f,i,m){const e=n("router-view");return r(),t(e)}const d=o(s,[["render",c]]);export{d as default};
