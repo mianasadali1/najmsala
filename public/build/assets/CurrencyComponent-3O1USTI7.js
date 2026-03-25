@@ -1,1 +1,0 @@
-import{_ as o,r as n,k as r,o as t}from"./app-GJ1prmrk.js";const c={name:"CurrencyComponent"};function s(a,p,_,m,u,f){const e=n("router-view");return t(),r(e)}const C=o(c,[["render",s]]);export{C as default};

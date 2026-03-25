@@ -1,0 +1,1 @@
+import{_ as o,r as n,k as r,o as t}from"./app-3N8FvZRn.js";const p={name:"SupplierComponent"};function s(c,a,_,i,m,u){const e=n("router-view");return t(),r(e)}const l=o(p,[["render",s]]);export{l as default};
