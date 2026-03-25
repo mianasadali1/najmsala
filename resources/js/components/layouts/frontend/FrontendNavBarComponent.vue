@@ -35,55 +35,11 @@
                         </li>
 
                         <li class="header-nav-item">
-                            <button type="button" class="header-nav-menu down-arrow">
+                            <router-link class="header-nav-menu"
+                                :class="checkIsPathAndRoutePathSame('/categories') ? 'router-link-active router-link-exact-active' : ''"
+                                :to="{ name: 'frontend.categories' }">
                                 {{ $t('label.categories') }}
-                            </button>
-                            <div
-                                class="fixed top-[64px] left-0 z-10 w-full origin-top scale-y-0 transition-all duration-300">
-                                <div class="container">
-                                    <div class="w-full rounded-b-2xl shadow-paper bg-white">
-                                        <nav class="w-full flex items-center justify-center">
-                                            <router-link v-for="(category, index) in categories" :key="index"
-                                                :to="{ name: 'frontend.product', query: { category: category.slug } }"
-                                                @mouseover.prevent="activeTab = 'category_' + category.slug"
-                                                class="capitalize text-sm font-semibold tracking-wide px-5 py-4 transition-all duration-300 relative before:content-[''] before:absolute before:bottom-0 before:left-0 before:h-0.5 before:bg-primary hover:text-primary"
-                                                :class="{ 'text-primary before:w-full before:transition-all before:duration-300': activeTab === 'category_' + category.slug }">
-                                                {{ category.name }}
-                                            </router-link>
-                                        </nav>
-                                        <div v-for="category in categories">
-                                            <div v-if="category.children.length > 0"
-                                                :class="{ 'block': activeTab === 'category_' + category.slug, 'hidden': activeTab !== 'category_' + category.slug }"
-                                                class="flex items-start gap-5 pb-5 border-t border-gray-200">
-                                                <div class="w-60 h-80 flex-shrink-0 pt-5 ltr:pl-5 rtl:pr-5">
-                                                    <img class="w-full h-full object-top object-cover rounded-lg"
-                                                        :src="category.cover" alt="category" />
-                                                </div>
-                                                <div class="w-full h-80 thin-scrolling pt-5 ltr:pr-5 rtl:pl-5">
-                                                    <div class="w-full grid gap-5 grid-cols-3">
-                                                        <div v-for="children in category.children" class="self-start">
-                                                            <h3
-                                                                class="text-sm font-semibold capitalize pb-3 border-b border-slate-200">
-                                                                <router-link
-                                                                    :to="{ name: 'frontend.product', query: { category: children.slug } }"
-                                                                    class="hover:text-primary transition-all duration-300">
-                                                                    {{ children.name }}
-                                                                </router-link>
-                                                            </h3>
-
-                                                            <nav v-if="children.children.length > 0"
-                                                                class="flex flex-col mt-2">
-                                                                <MenuChildrenComponent
-                                                                    :categories="children.children" />
-                                                            </nav>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            </router-link>
                         </li>
 
                         <li class="header-nav-item">
@@ -312,7 +268,6 @@ import targetService from "../../../services/targetService";
 import appService from "../../../services/appService";
 import activityEnum from "../../../enums/modules/activityEnum";
 import roleEnum from "../../../enums/modules/roleEnum";
-import MenuChildrenComponent from "../../frontend/components/MenuChildrenComponent";
 import orderTypeEnum from "../../../enums/modules/orderTypeEnum";
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
@@ -323,7 +278,6 @@ import { useCanvas } from "../../../composables/canvas";
 
 export default {
     name: "FrontendNavbarComponent",
-    components: { MenuChildrenComponent },
     setup() {
         const isSticky = ref();
         const { openCanvas } = useCanvas();
@@ -360,8 +314,6 @@ export default {
                 order_type: "asc",
                 status: statusEnum.ACTIVE
             },
-            categoryTabStatus: false,
-            activeTab: null,
             searchProduct: "",
             orderNotificationStatus: false,
             orderNotificationMessage: "",
@@ -389,9 +341,6 @@ export default {
         },
         languages: function () {
             return this.$store.getters['frontendLanguage/lists'];
-        },
-        categories: function () {
-            return this.$store.getters['frontendProductCategory/trees'];
         },
         wishlists: function () {
             return this.$store.getters['frontendWishlist/lists'];

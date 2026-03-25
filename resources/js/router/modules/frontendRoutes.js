@@ -1,5 +1,6 @@
 import  HomeComponent from "../../components/frontend/home/HomeComponent";
 const  WishlistComponent = () => import("../../components/frontend/wishlist/WishlistComponent");
+const CategoriesComponent = () => import("../../components/frontend/categories/CategoriesComponent");
 const  OrderHistoryComponent = () => import("../../components/frontend/account/orderHistory/OrderHistoryComponent");
 const  ReturnOrdersComponent = () => import("../../components/frontend/account/returnOrders/ReturnOrdersComponent");
 const  ReturnOrderDetailsComponent = () => import("../../components/frontend/account/returnOrders/ReturnOrderDetailsComponent");
@@ -32,6 +33,15 @@ export default [
         path: "/home",
         component: HomeComponent,
         name: "frontend.home",
+        meta: {
+            isFrontend: true,
+            auth: false,
+        },
+    },
+    {
+        path: "/categories",
+        component: CategoriesComponent,
+        name: "frontend.categories",
         meta: {
             isFrontend: true,
             auth: false,

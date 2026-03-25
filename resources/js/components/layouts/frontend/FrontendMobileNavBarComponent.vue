@@ -5,10 +5,13 @@
             <span class="text-xs font-medium capitalize">{{ $t('label.home') }}</span>
         </router-link>
 
-        <button @click.prevent="showTarget('mobile-category-canvas', 'canvas-active')" type="button" class="flex flex-col items-center gap-1 text-text transition-all duration-300 hover:text-primary">
+        <router-link
+            :to="{ name: 'frontend.categories' }"
+            class="flex flex-col items-center gap-1 text-text transition-all duration-300 hover:text-primary"
+            :class="checkIsPathAndRoutePathSame('/categories') ? 'router-link-active router-link-exact-active !text-primary' : ''">
             <i class="lab-line-category text-lg leading-none"></i>
             <span class="text-xs font-medium capitalize">{{ $t('label.categories') }}</span>
-        </button>
+        </router-link>
 
         <button @click="showTarget('cart-canvas', 'canvas-active')" type="button" class="relative isolate -mt-11">
             <i class="lab-line-bag text-lg w-12 h-12 !leading-12 text-center rounded-full shadow-cart bg-primary text-white"></i>

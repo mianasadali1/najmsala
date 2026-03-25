@@ -171,7 +171,7 @@
     .cs-custom-radio:checked { @apply before:border-primary after:bg-primary }
 
     /* HEADER */
-    .header-nav-list { @apply flex items-center justify-center gap-10 }
+    .header-nav-list { @apply flex items-center justify-center gap-6 lg:gap-10 whitespace-nowrap }
     .header-nav-item { @apply relative }
     .header-nav-item:hover > div { @apply scale-y-100 }
     .header-nav-menu { @apply capitalize font-semibold py-5 }
@@ -541,6 +541,14 @@
 
 @layer utilities {
     .transition { @apply transition-all duration-300 ease-linear }
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
 }
 
 .swiper:hover .banner-swiper-navigate { @apply opacity-100 }
