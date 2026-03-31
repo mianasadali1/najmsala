@@ -9,6 +9,7 @@ use App\Models\ProductBrand;
 use App\Models\ProductCategory;
 use App\Models\ProductTag;
 use App\Models\Stock;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -142,14 +143,24 @@ class ProductCustomImportService
             $avail  = strtolower($data['availability'] ?? 'active');
             $status = in_array($avail, ['inactive', 'no', '0']) ? Status::INACTIVE : Status::ACTIVE;
 
-            // Prices
+            // Prices — `discount` column is stored as percentage (see ProductAdminResource, admin "discount %").
             $sellingPrice = (float) ($data['price'] ?? 0);
             $discount     = 0;
-            if (!empty($data['discounted_price']) && is_numeric($data['discounted_price'])) {
-                $discountedPrice = (float) $data['discounted_price'];
-                if ($discountedPrice < $sellingPrice) {
-                    $discount = $sellingPrice - $discountedPrice;
+            $discountedRaw = $data['discounted_price'] ?? '';
+            $discountedRaw = is_string($discountedRaw) ? str_replace(',', '', trim($discountedRaw)) : $discountedRaw;
+            if ($discountedRaw !== '' && is_numeric($discountedRaw) && $sellingPrice > 0) {
+                $discountedPrice = (float) $discountedRaw;
+                if ($discountedPrice >= 0 && $discountedPrice < $sellingPrice) {
+                    $discount = (($sellingPrice - $discountedPrice) / $sellingPrice) * 100;
                 }
+            }
+
+            // Offer window so `is_offer` / storefront treat the discount as active (fixed Excel price → % in DB).
+            $offerStartDate = null;
+            $offerEndDate   = null;
+            if ($discount > 0) {
+                $offerStartDate = Carbon::yesterday()->startOfDay()->format('Y-m-d H:i:s');
+                $offerEndDate   = Carbon::now()->addYear()->format('Y-m-d H:i:s');
             }
 
             $product = Product::create([
@@ -158,14 +169,17 @@ class ProductCustomImportService
                 'sku'                 => strtoupper(Str::random(8)),
                 'product_category_id' => $categoryId,
                 'product_brand_id'    => $brandId,
+                'unit_id'             => 10,
                 'selling_price'       => $sellingPrice,
                 'variation_price'     => $sellingPrice,
                 'buying_price'        => $sellingPrice,
-                'discount'            => $discount,
+                'discount'            => round($discount, 6),
+                'offer_start_date'    => $offerStartDate,
+                'offer_end_date'      => $offerEndDate,
                 'description'         => $data['description'] ?? '',
                 'status'              => $status,
                 'can_purchasable'     => Ask::YES,
-                'show_stock_out'      => Ask::YES,
+                'show_stock_out'      => Ask::NO,
                 'refundable'          => Ask::YES,
                 'thumbnail_url'       => !empty($data['thumbnail']) ? $data['thumbnail'] : null,
                 'image1_url'          => !empty($data['image1'])    ? $data['image1']    : null,
